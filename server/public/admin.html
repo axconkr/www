@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AX Consulting - 관리자 패널</title>
+    
+    <!-- Tailwind CSS -->
+    <link rel="stylesheet" href="css/tailwind.min.css">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="css/fontawesome.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+        
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+        
+        .status-contacted {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #3b82f6;
+        }
+        
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        
+        .status-cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 32px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity 0.3s ease;
+        }
+        
+        .fade-enter-from, .fade-leave-to {
+            opacity: 0;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        
+        .stat-value {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        
+        .consultation-item {
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .consultation-item:hover {
+            background-color: #f9fafb;
+        }
+        
+        .consultation-item:last-child {
+            border-bottom: none;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            margin-top: 24px;
+        }
+        
+        .page-btn {
+            padding: 8px 16px;
+            border: 1px solid #d1d5db;
+            background: white;
+            color: #374151;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .page-btn:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+        
+        .page-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .modal-content {
+                padding: 20px;
+                margin: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 로그인 화면 -->
+        <div v-if="!isLoggedIn" class="gradient-bg flex items-center justify-center p-4">
+            <div class="w-full max-w-md">
+                <!-- 로고 및 제목 -->
+                <div class="text-center mb-8">
+                    <div class="mx-auto w-20 h-20 bg-white rounded-full flex items-center justify-center mb-6 shadow-2xl">
+                        <i class="fas fa-chart-line text-4xl text-indigo-600"></i>
+                    </div>
+                    <h1 class="text-4xl font-bold text-white mb-3">
+                        AX Consulting
+                    </h1>
+                    <p class="text-xl text-white/90">
+                        관리자 패널
+                    </p>
+                </div>
+
+                <!-- 로그인 폼 -->
+                <div class="glass-card rounded-3xl p-8">
+                    <form @submit.prevent="login" class="space-y-6">
+                        <div>
+                            <label for="username" class="block text-sm font-semibold text-white mb-3">
+                                <i class="fas fa-user mr-2"></i>사용자명
+                            </label>
+                            <input 
+                                id="username" 
+                                name="username" 
+                                type="text" 
+                                required 
+                                v-model="loginForm.username"
+                                class="input-field" 
+                                placeholder="admin"
+                            >
+                        </div>
+                        
+                        <div>
+                            <label for="password" class="block text-sm font-semibold text-white mb-3">
+                                <i class="fas fa-lock mr-2"></i>비밀번호
+                            </label>
+                            <input 
+                                id="password" 
+                                name="password" 
+                                type="password" 
+                                required 
+                                v-model="loginForm.password"
+                                class="input-field" 
+                                placeholder="••••••••"
+                            >
+                        </div>
+
+                        <button 
+                            type="submit" 
+                            :disabled="isLoading"
+                            class="btn-primary w-full text-lg py-4"
+                        >
+                            <span v-if="isLoading" class="flex items-center justify-center">
+                                <div class="loading-spinner mr-3"></div>
+                                로그인 중...
+                            </span>
+                            <span v-else class="flex items-center justify-center">
+                                <i class="fas fa-sign-in-alt mr-3"></i>
+                                로그인
+                            </span>
+                        </button>
+
+                        <div v-if="errorMessage" class="text-center p-4 bg-red-500/20 border border-red-500/30 rounded-xl">
+                            <p class="text-red-200 text-sm">
+                                <i class="fas fa-exclamation-triangle mr-2"></i>
+                                {{ errorMessage }}
+                            </p>
+                        </div>
+
+                        <!-- 기본 계정 정보 -->
+                        <div class="text-center p-4 bg-white/10 rounded-xl">
+                            <p class="text-white/80 text-sm">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                기본 계정: admin / admin123
+                            </p>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- 메인 관리자 패널 -->
+        <div v-else class="min-h-screen bg-gray-50">
+            <!-- 헤더 -->
+            <header class="bg-white shadow-sm border-b border-gray-200">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="flex justify-between items-center py-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center">
+                                <i class="fas fa-chart-line text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h1 class="text-xl font-bold text-gray-900">AX Consulting 관리자</h1>
+                                <p class="text-sm text-gray-500">상담 신청 관리 시스템</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <div class="text-right">
+                                <p class="text-sm font-medium text-gray-900">{{ adminInfo.username }}님</p>
+                                <p class="text-xs text-gray-500">{{ adminInfo.email }}</p>
+                            </div>
+                            <button @click="logout" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+                                <i class="fas fa-sign-out-alt mr-2"></i>
+                                로그아웃
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <!-- 통계 카드 -->
+                <div class="stats-grid">
+                    <div class="stat-card card-hover">
+                        <div class="stat-icon bg-blue-500">
+                            <i class="fas fa-users text-white text-xl"></i>
+                        </div>
+                        <div class="stat-value">{{ stats.total || 0 }}</div>
+                        <div class="stat-label">전체 상담</div>
+                    </div>
+
+                    <div class="stat-card card-hover">
+                        <div class="stat-icon bg-yellow-500">
+                            <i class="fas fa-clock text-white text-xl"></i>
+                        </div>
+                        <div class="stat-value">{{ stats.pending || 0 }}</div>
+                        <div class="stat-label">대기 중</div>
+                    </div>
+
+                    <div class="stat-card card-hover">
+                        <div class="stat-icon bg-green-500">
+                            <i class="fas fa-check-circle text-white text-xl"></i>
+                        </div>
+                        <div class="stat-value">{{ stats.completed || 0 }}</div>
+                        <div class="stat-label">완료</div>
+                    </div>
+
+                    <div class="stat-card card-hover">
+                        <div class="stat-icon bg-indigo-500">
+                            <i class="fas fa-calendar-day text-white text-xl"></i>
+                        </div>
+                        <div class="stat-value">{{ stats.today || 0 }}</div>
+                        <div class="stat-label">오늘</div>
+                    </div>
+                </div>
+
+                <!-- 필터 및 검색 -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-search mr-2"></i>검색
+                            </label>
+                            <input 
+                                type="text" 
+                                v-model="filters.search" 
+                                placeholder="이름, 회사, 이메일로 검색..."
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            >
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-filter mr-2"></i>상태
+                            </label>
+                            <select 
+                                v-model="filters.status" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            >
+                                <option value="all">전체</option>
+                                <option value="pending">대기 중</option>
+                                <option value="contacted">연락 완료</option>
+                                <option value="completed">완료</option>
+                                <option value="cancelled">취소</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-list mr-2"></i>페이지당
+                            </label>
+                            <select 
+                                v-model="filters.limit" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                            >
+                                <option value="10">10개</option>
+                                <option value="20">20개</option>
+                                <option value="50">50개</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 상담 신청 목록 -->
+                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900">
+                                    <i class="fas fa-list-alt mr-2"></i>상담 신청 목록
+                                </h3>
+                                <p class="text-sm text-gray-500 mt-1">총 {{ pagination.total }}건의 상담 신청</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm text-gray-500">
+                                    {{ (pagination.page - 1) * pagination.limit + 1 }} - {{ Math.min(pagination.page * pagination.limit, pagination.total) }} / {{ pagination.total }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div v-if="isLoading" class="p-12 text-center">
+                        <div class="inline-flex items-center px-6 py-3 font-semibold text-sm shadow rounded-lg text-white bg-indigo-500">
+                            <div class="loading-spinner mr-3"></div>
+                            로딩 중...
+                        </div>
+                    </div>
+
+                    <div v-else-if="consultations.length === 0" class="p-12 text-center text-gray-500">
+                        <i class="fas fa-inbox text-4xl mb-4 text-gray-300"></i>
+                        <p class="text-lg">상담 신청이 없습니다.</p>
+                    </div>
+
+                    <div v-else>
+                        <div v-for="consultation in consultations" :key="consultation.id" 
+                             class="consultation-item"
+                             @click="showDetail(consultation)">
+                            <div class="flex items-center justify-between">
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center space-x-3 mb-2">
+                                        <div class="flex items-center space-x-2">
+                                            <i class="fas fa-user text-gray-400"></i>
+                                            <p class="text-sm font-medium text-gray-900">
+                                                {{ consultation.name }}
+                                            </p>
+                                        </div>
+                                        <span class="status-badge" :class="getStatusClass(consultation.status)">
+                                            <i :class="getStatusIcon(consultation.status)" class="mr-1"></i>
+                                            {{ getStatusText(consultation.status) }}
+                                        </span>
+                                    </div>
+                                    <div class="flex items-center space-x-4 text-sm text-gray-500">
+                                        <span><i class="fas fa-building mr-1"></i>{{ consultation.company }}</span>
+                                        <span><i class="fas fa-envelope mr-1"></i>{{ consultation.email }}</span>
+                                        <span v-if="consultation.phone"><i class="fas fa-phone mr-1"></i>{{ consultation.phone }}</span>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-sm text-gray-500">{{ formatDate(consultation.created_at) }}</p>
+                                    <p class="text-xs text-gray-400 mt-1">접수일시</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 페이지네이션 -->
+                    <div v-if="pagination.totalPages > 1" class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+                        <div class="pagination">
+                            <button @click="changePage(pagination.page - 1)" 
+                                    :disabled="pagination.page <= 1"
+                                    class="page-btn">
+                                <i class="fas fa-chevron-left mr-2"></i>이전
+                            </button>
+                            
+                            <template v-for="page in getPageNumbers()" :key="page">
+                                <button v-if="page !== '...'" 
+                                        @click="changePage(page)"
+                                        :class="['page-btn', page === pagination.page ? 'active' : '']">
+                                    {{ page }}
+                                </button>
+                                <span v-else class="px-4 py-2 text-gray-500">...</span>
+                            </template>
+
+                            <button @click="changePage(pagination.page + 1)" 
+                                    :disabled="pagination.page >= pagination.totalPages"
+                                    class="page-btn">
+                                다음<i class="fas fa-chevron-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- 상담 신청 상세 모달 -->
+        <div v-if="selectedConsultation" class="modal-overlay" @click="selectedConsultation = null">
+            <div class="modal-content" @click.stop>
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-semibold text-gray-900">
+                        <i class="fas fa-eye mr-2 text-indigo-600"></i>상담 신청 상세
+                    </h3>
+                    <button @click="selectedConsultation = null" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-user mr-2 text-indigo-600"></i>이름
+                            </label>
+                            <p class="text-sm text-gray-900 font-medium">{{ selectedConsultation.name }}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-building mr-2 text-indigo-600"></i>회사
+                            </label>
+                            <p class="text-sm text-gray-900 font-medium">{{ selectedConsultation.company }}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-envelope mr-2 text-indigo-600"></i>이메일
+                            </label>
+                            <p class="text-sm text-gray-900 font-medium">{{ selectedConsultation.email }}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-phone mr-2 text-indigo-600"></i>연락처
+                            </label>
+                            <p class="text-sm text-gray-900 font-medium">{{ selectedConsultation.phone || '-' }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-comment mr-2 text-indigo-600"></i>상담 내용
+                        </label>
+                        <p class="text-sm text-gray-900 whitespace-pre-wrap">{{ selectedConsultation.message }}</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-calendar mr-2 text-indigo-600"></i>접수일시
+                            </label>
+                            <p class="text-sm text-gray-900">{{ formatDate(selectedConsultation.created_at) }}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-tasks mr-2 text-indigo-600"></i>상태
+                            </label>
+                            <select v-model="selectedConsultation.status" 
+                                    @change="updateStatus(selectedConsultation.id, selectedConsultation.status)"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                                <option value="pending">대기 중</option>
+                                <option value="contacted">연락 완료</option>
+                                <option value="completed">완료</option>
+                                <option value="cancelled">취소</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vue.js -->
+    <script src="js/vue.runtime.global.js"></script>
+    
+    <!-- Axios -->
+    <script src="js/axios.min.js"></script>
+    
+    <!-- Admin Application -->
+    <script src="js/admin.js"></script>
+</body>
+</html>
