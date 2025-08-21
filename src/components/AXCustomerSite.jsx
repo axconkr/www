@@ -27,6 +27,8 @@ const CONTENT = {
   },
   storytelling: {
     currentToNeed: "그렇다면, 왜 지금 AI 도입이 필요할까요?",
+    currentToFit: "그렇다면, 지금 당장 자동화할 수 있는 업무는 무엇일까요?",
+    fitToChecklist: "도입 전에 반드시 확인해야 할 것은요?",
     needToProcess: "그렇다면, 어떻게 도입해야 할까요?",
     processToAreas: "어디부터 적용하는 것이 효과적일까요?",
     areasToWhy: "그렇다면, 왜 AX Consulting이어야 할까요?",
@@ -36,27 +38,66 @@ const CONTENT = {
   },
   current: {
     title: "중소기업 AI 도입 현황",
-    subtitle: "대기업 대비 낮은 도입률, 그러나 ROI 잠재력은 큼",
+    subtitle: "대기업 대비 도입률은 낮지만, ROI 잠재력은 큽니다",
     points: [
       "중소기업의 AI 도입률은 25% 미만",
       "AI 도입 기업은 평균 18~30% 생산성 향상",
       "리소스·노하우 부족이 가장 큰 장벽",
     ],
   },
+  fit: {
+    title: "AI 자동화 Fit Map",
+    subtitle: "자동화하기 쉬운 업무 vs 어려운 업무",
+    easy: [
+      "명확한 규칙 검토(계약/서류 규정 준수, 품질 검사)",
+      "패턴 기반 예측(수요·매출·트렌드)",
+      "패턴 인식(이미지·음성 분류)",
+      "맞춤형 추천(상품·콘텐츠·광고)",
+      "템플릿 기반 생성·분류(보고서 자동화, 데이터 입력)",
+    ],
+    hard: [
+      "예측 불가능 상황 대응(위기·이슈 처리)",
+      "감정 기반 커뮤니케이션(협상·갈등 조정)",
+      "최종 책임 의사결정(인사·투자)",
+      "전략적 방향 설정(신사업·M&A)",
+      "윤리·사회적 판단(데이터 활용·고용 영향)",
+    ],
+  },
+  checklist: {
+    title: "AI 도입 체크리스트",
+    items: [
+      "업무 적합성: 규칙성·빈도·반복성·오류비용",
+      "데이터: 양/질/정합성/접근권한",
+      "KPI: 시간·비용·품질·CSAT 등 성공 기준",
+      "보안/컴플라이언스: PII 분류·마스킹·감사로깅",
+      "운영: 담당자·교육·모니터링 체계",
+      "기술: API/DB 연동, RPA/LLM 스택 적합성",
+    ],
+  },
   need: {
     title: "왜 지금 AI 도입이 필요한가?",
     subtitle: "생존과 성장의 핵심 전략",
     points: [
-      "반복 업무 자동화로 인력 효율 극대화",
-      "고객경험 개선: 챗봇·개인화 마케팅",
-      "의사결정 보조: 수요예측·재고 최적화",
+      "시간 절약: 반복업무 자동화로 핵심 업무 집중",
+      "비용 절감: 처리 효율 증대로 운영비 절감",
+      "업무 만족도: 단순 작업 ↓, 전문성·창의성 ↑",
+      "24시간 운영: 고객 대응의 시간/채널 제약 해소",
+      "데이터 기반 의사결정: 자동 수집/분석 데이터 활용",
     ],
   },
-  process: [
+  process4D: [
     { step: "Define", title: "진단/목표정의", desc: "KPI·데이터·제약 분석, 비즈니스 케이스" },
     { step: "Design", title: "설계/파일럿", desc: "PoC 가설·성공기준·보안 설계" },
     { step: "Deliver", title: "구축/확산", desc: "Agent·RPA·시스템 연동, 교육" },
     { step: "Drive", title: "운영/고도화", desc: "모니터링·튜닝·확장" },
+  ],
+  steps6: [
+    { idx: 1, title: "사례 발굴", desc: "벤치마크·현업 인터뷰로 아이디어 수집" },
+    { idx: 2, title: "문제정의", desc: "As-Is/To-Be 정리, KPI·요건 명세" },
+    { idx: 3, title: "파일럿 제작", desc: "데모(5일~2주)로 가설 검증" },
+    { idx: 4, title: "리파인", desc: "피드백 반영·성능/UX 개선" },
+    { idx: 5, title: "실무 적용", desc: "API/DB 연동·교육·운영 런북" },
+    { idx: 6, title: "운영/개선", desc: "모니터링·A/B·지속 업데이트" },
   ],
   areas: [
     { field: "제조", desc: "품질관리, 생산계획 자동화" },
@@ -260,6 +301,44 @@ function Current() {
   );
 }
 
+function FitMap() {
+  return (
+    <section className={`py-16 md:py-20 ${THEME.text}`}>
+      <SectionHeader title={CONTENT.fit.title} subtitle={CONTENT.fit.subtitle} />
+      <div className="max-w-6xl mx-auto px-6 mt-10 grid md:grid-cols-2 gap-6">
+        <div className={`${THEME.card} rounded-2xl p-6`}>
+          <div className="font-bold text-cyan-300 mb-2">자동화하기 쉬운 업무</div>
+          <ul className="list-disc list-inside space-y-2 opacity-90">
+            {CONTENT.fit.easy.map((t,i)=>(<li key={i}>{t}</li>))}
+          </ul>
+        </div>
+        <div className={`${THEME.card} rounded-2xl p-6`}>
+          <div className="font-bold text-rose-300 mb-2">자동화하기 어려운 업무</div>
+          <ul className="list-disc list-inside space-y-2 opacity-90">
+            {CONTENT.fit.hard.map((t,i)=>(<li key={i}>{t}</li>))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Checklist() {
+  return (
+    <section className={`py-16 md:py-20 ${THEME.text}`}>
+      <SectionHeader title={CONTENT.checklist.title} subtitle="도입 전 필수 점검 항목" />
+      <div className="max-w-5xl mx-auto px-6 mt-8 grid md:grid-cols-2 gap-4">
+        {CONTENT.checklist.items.map((c,i)=>(
+          <div key={i} className={`${THEME.card} rounded-xl p-4 flex items-start gap-3`}>
+            <span className="mt-1 inline-block w-2.5 h-2.5 rounded-full" style={{background: THEME.accent}} />
+            <span className="opacity-90 text-sm">{c}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function Need() {
   return (
     <section className={`py-16 md:py-20 ${THEME.text}`}>
@@ -276,11 +355,28 @@ function ProcessInfographic() {
     <section className={`py-16 md:py-24 ${THEME.text}`}>
       <SectionHeader kicker="AX 방법론" title="AM-4D: Define → Design → Deliver → Drive" subtitle="발굴–파일럿–확산–운영으로 리스크를 단계적으로 관리" />
       <div className="max-w-6xl mx-auto px-6 mt-10 grid grid-cols-2 md:grid-cols-4 gap-6">
-        {CONTENT.process.map((p, i) => (
+        {CONTENT.process4D.map((p, i) => (
           <motion.div key={i} initial={{opacity:0, y:16}} whileInView={{opacity:1, y:0}} transition={{duration:.5, delay:i*.05}} viewport={{once:true}} className={`${THEME.card} rounded-full w-full aspect-square flex flex-col items-center justify-center text-center p-4 card-hover`}>
             <div className="font-bold" style={{color: THEME.accent}}>{p.step}</div>
             <div className="mt-2 text-sm font-semibold">{p.title}</div>
             <p className="mt-1 text-xs opacity-80 max-w-[12rem]">{p.desc}</p>
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function Steps6() {
+  return (
+    <section className={`py-16 md:py-20 ${THEME.text}`}>
+      <SectionHeader title="도입 절차(6단계)" subtitle="파일럿부터 운영까지, 빠르게 검증하고 안정적으로 확산" />
+      <div className="max-w-5xl mx-auto px-6 mt-10 grid md:grid-cols-3 gap-6">
+        {CONTENT.steps6.map((s,i)=>(
+          <motion.div key={i} initial={{opacity:0, y:16}} whileInView={{opacity:1, y:0}} transition={{duration:.4, delay:i*.05}} viewport={{once:true}} className={`${THEME.card} rounded-2xl p-6`}>
+            <div className="text-sm font-bold" style={{color: THEME.accent}}>STEP {s.idx}</div>
+            <div className="mt-2 font-semibold">{s.title}</div>
+            <p className="mt-1 text-sm opacity-80">{s.desc}</p>
           </motion.div>
         ))}
       </div>
@@ -512,10 +608,15 @@ export default function AXCustomerSite() {
     <div className={`${THEME.bg} min-h-screen ${THEME.text}`}>
       <Hero />
       <Current />
+      <StoryText text={CONTENT.storytelling.currentToFit} />
+      <FitMap />
+      <StoryText text={CONTENT.storytelling.fitToChecklist} />
+      <Checklist />
       <StoryText text={CONTENT.storytelling.currentToNeed} />
       <Need />
       <StoryText text={CONTENT.storytelling.needToProcess} />
       <ProcessInfographic />
+      <Steps6 />
       <StoryText text={CONTENT.storytelling.processToAreas} />
       <Areas />
       <StoryText text={CONTENT.storytelling.areasToWhy} />
