@@ -1,0 +1,88 @@
+# AX Consulting 웹사이트 프로젝트 규칙
+
+## 프로젝트 개요
+AX Consulting 고객용 웹사이트 - 중소기업을 위한 AI 도입 컨설팅 서비스
+
+## 핵심 기술 스택
+- **프론트엔드**: React 18 + Vite + Tailwind CSS + Framer Motion
+- **백엔드**: Node.js + Express + SQLite3 + JWT
+- **관리자 패널**: Vue.js 3 (runtime-only) + Axios
+
+## 아키텍처 패턴
+- 프론트엔드/백엔드 분리 아키텍처
+- RESTful API 설계
+- JWT 기반 인증 시스템
+- 컴포넌트 기반 React 구조
+
+## 디자인 원칙
+- **테마**: Bold Dark 고정 (slate-950 기반)
+- **색상**: cyan-400 (#22d3ee) 액센트 컬러
+- **스타일**: Tailwind CSS 유틸리티 클래스 우선
+- **애니메이션**: Framer Motion을 활용한 부드러운 전환
+
+## 코드 스타일
+- 함수형 컴포넌트 사용
+- Props 기반 데이터 전달
+- 재사용 가능한 컴포넌트 설계
+- 명확한 네이밍 컨벤션
+
+## 파일 구조
+```
+src/
+├── components/
+│   └── AXCustomerSite.jsx (메인 컴포넌트)
+├── main.jsx (진입점)
+└── index.css (글로벌 스타일)
+
+server/
+├── server.js (Express 서버)
+├── init-db.js (데이터베이스 초기화)
+└── public/
+    ├── admin.html (관리자 패널)
+    └── js/admin.js (Vue.js 앱)
+```
+
+## 주요 섹션 구성
+1. Hero (히어로)
+2. Current (현황)
+3. FitMap (AI 자동화 적합성)
+4. Checklist (도입 체크리스트)
+5. Need (필요성)
+6. ProcessInfographic (4D 방법론)
+7. Steps6 (6단계 절차)
+8. Areas (적용 영역)
+9. WhyAX (AX 선택 이유)
+10. Compare (비교표)
+11. GraphSection (성과 그래프)
+12. Overseas (해외 사례)
+13. Contact (상담 신청)
+14. Footer (푸터)
+
+## 보안 고려사항
+- Content Security Policy (CSP) 준수
+- JWT 토큰 기반 인증
+- bcrypt 비밀번호 해싱
+- 입력 데이터 검증
+
+## 성능 최적화
+- Vite 빌드 도구 활용
+- 코드 스플리팅
+- 이미지 최적화 (SVG 우선)
+- 애니메이션 성능 최적화
+
+## 배포 전략
+- 프론트엔드: 정적 호스팅 (Vercel/Netlify)
+- 백엔드: 서버리스 함수 또는 전용 서버
+- 데이터베이스: SQLite → PostgreSQL 마이그레이션 계획
+
+## 개발 워크플로우
+1. 로컬 개발 및 테스트
+2. Git 커밋 및 푸시
+3. 자동 빌드 및 배포
+4. 모니터링 및 최적화
+
+## 주의사항
+- CSP 위반 방지 (CDN 대신 로컬 파일 사용)
+- Vue.js runtime-only 빌드 사용
+- 데이터베이스 백업 및 마이그레이션 계획
+- HTTPS 필수 (프로덕션 환경)

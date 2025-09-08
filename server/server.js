@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const cors = require('cors');
@@ -6,6 +7,7 @@ const rateLimit = require('express-rate-limit');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const path = require('path');
+const nodemailer = require('nodemailer');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -29,6 +31,70 @@ const db = new sqlite3.Database(path.join(__dirname, 'database.sqlite'));
 
 // JWT 시크릿 키 (실제 운영에서는 환경변수로 관리)
 const JWT_SECRET = process.env.JWT_SECRET || 'ax-consulting-secret-key-2025';
+
+// 이메일 설정
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER || 'axconkr@gmail.com',
+    pass: process.env.EMAIL_PASS || 'your-app-password-here' // Gmail 앱 비밀번호 필요
+  }
+});
+
+// 이메일 전송 함수
+async function sendConsultationEmail(consultationData) {
+  // 이메일 설정이 없으면 건너뛰기
+  if (!process.env.EMAIL_PASS || process.env.EMAIL_PASS === 'your-app-password-here') {
+    console.log('⚠️  이메일 전송 건너뜀: EMAIL_PASS 환경변수가 설정되지 않았습니다.');
+    console.log('📧 상담 신청 정보:', consultationData);
+    return { success: false, error: '이메일 설정 없음' };
+  }
+
+  const { name, company, email, phone, message } = consultationData;
+  
+  const mailOptions = {
+    from: process.env.EMAIL_USER || 'axconkr@gmail.com',
+    to: 'axconkr@gmail.com',
+    subject: `[AX Consulting] 새로운 상담 신청 - ${company} (${name})`,
+    html: `
+      <h2>새로운 상담 신청이 접수되었습니다</h2>
+      <hr>
+      <p><strong>신청자명:</strong> ${name}</p>
+      <p><strong>회사명:</strong> ${company}</p>
+      <p><strong>이메일:</strong> ${email}</p>
+      <p><strong>연락처:</strong> ${phone || '미제공'}</p>
+      <p><strong>신청 시간:</strong> ${new Date().toLocaleString('ko-KR')}</p>
+      <hr>
+      <h3>상담 내용</h3>
+      <p>${message.replace(/\n/g, '<br>')}</p>
+      <hr>
+      <p><small>이 메일은 AX Consulting 웹사이트를 통해 자동 발송되었습니다.</small></p>
+    `,
+    text: `
+새로운 상담 신청이 접수되었습니다
+
+신청자명: ${name}
+회사명: ${company}
+이메일: ${email}
+연락처: ${phone || '미제공'}
+신청 시간: ${new Date().toLocaleString('ko-KR')}
+
+상담 내용:
+${message}
+
+이 메일은 AX Consulting 웹사이트를 통해 자동 발송되었습니다.
+    `
+  };
+
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log('상담 신청 알림 이메일 전송 성공:', info.messageId);
+    return { success: true, messageId: info.messageId };
+  } catch (error) {
+    console.error('이메일 전송 실패:', error);
+    return { success: false, error: error.message };
+  }
+}
 
 // ====== API 엔드포인트 ======
 
@@ -60,7 +126,7 @@ app.post('/api/consultations', async (req, res) => {
       VALUES (?, ?, ?, ?, ?)
     `;
     
-    db.run(sql, [name, company, email, phone, message], function(err) {
+    db.run(sql, [name, company, email, phone, message], async function(err) {
       if (err) {
         console.error('상담 신청 저장 오류:', err);
         return res.status(500).json({ 
@@ -69,10 +135,22 @@ app.post('/api/consultations', async (req, res) => {
         });
       }
 
+      const consultationId = this.lastID;
+
+      // 이메일 전송 시도
+      const emailResult = await sendConsultationEmail({ name, company, email, phone, message });
+      
+      if (emailResult.success) {
+        console.log(`상담 신청 ${consultationId}: 이메일 알림 전송 완료`);
+      } else {
+        console.error(`상담 신청 ${consultationId}: 이메일 전송 실패 -`, emailResult.error);
+      }
+
       res.status(201).json({
         success: true,
         message: '상담 신청이 성공적으로 접수되었습니다.',
-        consultationId: this.lastID
+        consultationId: consultationId,
+        emailSent: emailResult.success
       });
     });
 

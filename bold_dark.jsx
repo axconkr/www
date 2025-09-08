@@ -107,7 +107,7 @@ const CONTENT = {
     secondary: "사례집 다운로드",
   },
   footer: {
-    contact: "contact@ax-consulting.kr · 02-XXX-XXXX",
+    contact: "axconkr@gmail.com · 010-4739-0704",
     address: "© 2025 AX Consulting",
   },
 };
@@ -405,7 +405,7 @@ function Contact() {
     const message = fd.get('message');
     const subject = encodeURIComponent(`[AX 상담요청] ${name} (${company})`);
     const body = encodeURIComponent(`이름: ${name}\n회사: ${company}\n이메일: ${email}\n연락처: ${phone}\n내용: ${message}`);
-    window.location.href = `mailto:contact@ax-consulting.kr?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:axconkr@gmail.com?subject=${subject}&body=${body}`;
   };
 
   return (
@@ -422,7 +422,7 @@ function Contact() {
         </div>
         <textarea name="message" rows={5} placeholder="상담이 필요한 업무/과제를 간단히 적어주세요" className="bg-slate-900/60 border border-slate-800 rounded-xl px-4 py-3 outline-none focus:border-cyan-400"/>
         <button className={`${THEME.buttonPrimary} w-full md:w-auto`}>제출하기</button>
-        <p className="text-xs opacity-60">전송이 안 되는 경우, <a href="mailto:contact@ax-consulting.kr" className="underline">contact@ax-consulting.kr</a>로 직접 메일 주세요.</p>
+        <p className="text-xs opacity-60">전송이 안 되는 경우, <a href="mailto:axconkr@gmail.com" className="underline">axconkr@gmail.com</a>로 직접 메일 주세요.</p>
       </form>
     </section>
   );
